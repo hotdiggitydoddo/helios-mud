@@ -1,0 +1,21 @@
+src/Helios.Data/bin
+src/Helios.Data/obj
+src/Helios.Domain/bin
+src/Helios.Domain/obj
+src/Helios.Engine/bin
+src/Helios.Engine/obj
+src/Helios.Web/bin
+src/Helios.Web/obj
+src/WebSocketManager/bin
+src/WebSocketManager/obj
+src/WebSocketManager.Common/bin
+src/WebSocketManager.Common/obj
+
+.DS_Store
+
+### VisualStudioCode ###
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
