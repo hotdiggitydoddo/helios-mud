@@ -39,12 +39,12 @@ namespace Helios.Engine.Objects
         //     if (!IsActive) return;
         //     _script.Call(_script.Globals["notify"], action);
         // }
-        public bool DoAction(MudAction action)
+        public virtual bool DoAction(MudAction action)
         {
             return _script.Call(_script.Globals["do"], action).Boolean;
         }
         
-        public void Tick(long elapsed)
+        public virtual void Tick(long elapsed)
         {
             if (!IsActive) return;
            _script.Call(_script.Globals["tick"], elapsed);

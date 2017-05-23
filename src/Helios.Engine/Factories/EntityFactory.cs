@@ -79,7 +79,7 @@ namespace Helios.Engine.Factories
         {
             var e = _entities.GetById(id, x => x.Traits);
 
-            var dto = new MudEntity(e.Id);
+            var dto = new MudEntity(e.Id, e.Name);
 
             foreach (var trait in e.Traits)
                 dto.Traits.Add(trait.Name, trait.Value);
