@@ -8,14 +8,14 @@ using Helios.Data;
 namespace Helios.Data.Migrations
 {
     [DbContext(typeof(HeliosDbContext))]
-    [Migration("20170522080737_Initial")]
-    partial class Initial
+    [Migration("20170523172437_InitialWin")]
+    partial class InitialWin
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
-                .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn)
-                .HasAnnotation("ProductVersion", "1.1.2");
+                .HasAnnotation("ProductVersion", "1.1.2")
+                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("Helios.Domain.Models.Account", b =>
                 {

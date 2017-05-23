@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Helios.Web", "src\Helios.We
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Helios.Data", "src\Helios.Data\Helios.Data.csproj", "{92F62A39-988E-497C-A56F-30E645954E9F}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Helios.ConsoleApp", "src\Helios.ConsoleApp\Helios.ConsoleApp.csproj", "{919925ED-433E-42D5-826E-5E2B6698068E}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebSocketManager", "src\WebSocketManager\WebSocketManager.csproj", "{BF7E6841-266F-454F-A684-9962BE525019}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebSocketManager.Common", "src\WebSocketManager.Common\WebSocketManager.Common.csproj", "{977DF809-73C2-4197-9AAB-3093F07EA90A}"
@@ -39,6 +41,10 @@ Global
 		{92F62A39-988E-497C-A56F-30E645954E9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{92F62A39-988E-497C-A56F-30E645954E9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{92F62A39-988E-497C-A56F-30E645954E9F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{919925ED-433E-42D5-826E-5E2B6698068E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{919925ED-433E-42D5-826E-5E2B6698068E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{919925ED-433E-42D5-826E-5E2B6698068E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{919925ED-433E-42D5-826E-5E2B6698068E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BF7E6841-266F-454F-A684-9962BE525019}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BF7E6841-266F-454F-A684-9962BE525019}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BF7E6841-266F-454F-A684-9962BE525019}.Release|Any CPU.ActiveCfg = Release|Any CPU
