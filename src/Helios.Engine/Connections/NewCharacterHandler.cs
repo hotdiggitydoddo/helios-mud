@@ -22,7 +22,7 @@ namespace Helios.Engine.Connections
         private NewCharState _state;
         private MudEntity _newChar;
 
-        public NewCharacterHandler(Connection c, Account a) : base(c, a)
+        public NewCharacterHandler(Connection c, Account a, params object[] args) : base(c, a, args)
         {
             try
             {
