@@ -213,6 +213,8 @@ namespace Helios.Engine
             if (character == null) return;
             if (!_entities.ContainsKey(character.Id))
                 _entities.Add(character.Id, character);
+            
+            character.Components.Add(new ReporterComponent(character, "reporter", null));
 
             var roomTrait = character.Traits.Get("room")?.Value;
             var roomId = !string.IsNullOrWhiteSpace(roomTrait) ? int.Parse(roomTrait) : 0;
