@@ -141,6 +141,9 @@ namespace Helios.Engine
                 Logout(action);
             else if (type == "infotoplayer")
                 GameToPlayer(action);
+            else if (type == "look")
+                RouteActionToEntity(action.SenderId, action);
+                
             // else if (type == "attemptgetitem")
             //     GetItem(action.SenderId, action.ReceiverId, action.OtherEntity1);
 
@@ -277,6 +280,7 @@ namespace Helios.Engine
                 ActionRoomItems(enterRoom, room.Id);
 
                 Commands.AssignCommand(character.Id, "quit");
+                Commands.AssignCommand(character.Id, "look");
             }
         }
 
@@ -431,6 +435,12 @@ namespace Helios.Engine
 
 
 
+        }
+
+        private void RouteActionToEntity(int entityId, MudAction action)
+        {
+            var mob = _entities[entityId];
+            mob.DoAction(action);
         }
 
         private void ActionRoomMobs(MudAction action, int roomId)

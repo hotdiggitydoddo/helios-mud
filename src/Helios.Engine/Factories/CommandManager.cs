@@ -98,9 +98,11 @@ namespace Helios.Engine.Factories
             var verb = parts[0].ToLower();
 
             if (verb == "commands")
+            {   
                 //need to communicate available commands to player.
+                Game.Instance.DoAction(new MudAction("infotoplayer", entityId, 0, string.Join(", ", GetCommands(entityId))));
                 return false;
-
+            }
             if (!_commandSet.ContainsKey(verb))
                 //Send error to client -- command doesn't exist
                 return false;

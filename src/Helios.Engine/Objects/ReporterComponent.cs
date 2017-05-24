@@ -30,7 +30,8 @@ namespace Helios.Engine.Objects
             }
             else if (action.Type == "enterroom")
                 EnterRoom(action);
-
+            else if (action.Type == "look")
+                EnterRoom(action);
             return true;
         }
 
