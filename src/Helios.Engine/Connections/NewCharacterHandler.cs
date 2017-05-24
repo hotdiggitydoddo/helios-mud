@@ -22,7 +22,7 @@ namespace Helios.Engine.Connections
         private NewCharState _state;
         private MudEntity _newChar;
 
-        public NewCharacterHandler(Connection c, Account a, params object[] args) : base(c, a, args)
+        public NewCharacterHandler(Connection c, Account a) : base(c, a)
         {
             try
             {
@@ -36,7 +36,7 @@ namespace Helios.Engine.Connections
             }
         }
 
-        public override void Enter()
+        public override void Enter(params object[] args)
         {
             _state = NewCharState.EnteringName;
             _newChar = new MudEntity(-1);

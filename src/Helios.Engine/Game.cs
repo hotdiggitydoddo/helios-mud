@@ -62,6 +62,30 @@ namespace Helios.Engine
             var room1 = new MudRoom(1, 1, "Western Clearing");
             var room2 = new MudRoom(2, 1, "Eastern Thicket");
             var room3 = new MudRoom(3, 1, "Camp");
+            room3.Traits.Add("description", "Surrounded by thick shrubbery and large, looming pine trees lies a modest encampment.  At its center, a fire crackles softly.");
+
+            //add an item
+            var torch = new MudEntity(777, "torch");
+            torch.Traits.Add("item", "true");
+            _entities.Add(torch.Id, torch);
+            room3.Entities.Add(torch.Id);
+
+            //add a mouse and snake and bear
+            var mouse = new MudEntity(888, "mouse");
+            mouse.Traits.Add("race", "mouse");
+            _entities.Add(mouse.Id, mouse);
+            room3.Entities.Add(mouse.Id);
+
+            var snake = new MudEntity(999, "snake");
+            snake.Traits.Add("race", "snake");
+            _entities.Add(snake.Id, snake);
+            room3.Entities.Add(snake.Id);
+
+            var bear = new MudEntity(222, "brown bear");
+            bear.Traits.Add("race", "bear");
+            _entities.Add(bear.Id, bear);
+            room3.Entities.Add(bear.Id);
+
 
             //camp --> west
             var p1 = new MudPortal(1, 3, "Passageway 1");
@@ -139,15 +163,20 @@ namespace Helios.Engine
         {
             return _entities.ContainsKey(id) ? _entities[id] : null;
         }
-        // public MudEntity GetRoomById(int roomId)
-        // {
-        //     return _rooms.ContainsKey(roomId) ? _rooms[roomId] : null;
-        // }
 
-        // public MudEntity GetZoneById(int zoneId)
-        // {
-        //     return _zones.ContainsKey(zoneId) ? _zones[zoneId] : null;
-        // }
+        public MudPortal GetPortalById(int id)
+        {
+             return _portals.ContainsKey(id) ? _portals[id] : null;
+        }
+        public MudRoom GetRoomById(int roomId)
+        {
+            return _rooms.ContainsKey(roomId) ? _rooms[roomId] : null;
+        }
+
+        public MudZone GetZoneById(int zoneId)
+        {
+            return _zones.ContainsKey(zoneId) ? _zones[zoneId] : null;
+        }
 
         public void SendMessage(int accountId, string message, params string[] args)
         {
@@ -213,7 +242,6 @@ namespace Helios.Engine
             if (character == null) return;
             if (!_entities.ContainsKey(character.Id))
                 _entities.Add(character.Id, character);
-            
             character.Components.Add(new ReporterComponent(character, "reporter", null));
 
             var roomTrait = character.Traits.Get("room")?.Value;

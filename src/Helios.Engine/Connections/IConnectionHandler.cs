@@ -6,7 +6,7 @@ namespace Helios.Engine.Connections
 {
     public interface IConnectionHandler
     {
-        void Enter();
+        void Enter(params object[] args);
         void Leave();
         void Handle(string command);
     }

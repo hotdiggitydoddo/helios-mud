@@ -14,7 +14,7 @@ namespace Helios.Engine.Connections
     }
     public class LoginHandler : ConnectionHandler
     {
-        public LoginHandler(Connection c, Account a, params object[] args) : base(c, a, args)
+        public LoginHandler(Connection c, Account a) : base(c, a)
         {
             try
             {
@@ -28,7 +28,7 @@ namespace Helios.Engine.Connections
             }
         }
 
-        public override void Enter()
+        public override void Enter(params object[] args)
         {
             Game.Instance.SendMessage(_account.Id, _script.Call(_script.Globals["getTitle"]).String);
             Game.Instance.SendMessage(_account.Id, _script.Call(_script.Globals["motd"]).String);
