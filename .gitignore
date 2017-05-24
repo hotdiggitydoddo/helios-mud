@@ -6,6 +6,8 @@ src/Helios.Engine/bin
 src/Helios.Engine/obj
 src/Helios.Web/bin
 src/Helios.Web/obj
+src/Helios.ConsoleApp/bin
+src/Helios.ConsoleApp/obj
 src/WebSocketManager/bin
 src/WebSocketManager/obj
 src/WebSocketManager.Common/bin

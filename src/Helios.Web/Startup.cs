@@ -45,7 +45,8 @@ namespace Helios.Web
             // Add framework services.
             services.AddDbContext<HeliosDbContext>(options =>
             {
-                options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"));
+                options.UseSqlServer("Data Source=(localdb)\\ProjectsV13;Initial Catalog=HeliosDb;Integrated Security=True;Persist Security Info=False");
+                //options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection"));
             });
 
             services.AddIdentity<User, IdentityRole<int>>(

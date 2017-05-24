@@ -17,11 +17,11 @@ namespace Helios.Engine.Connections
             State = ConnectionState.Login;
         }
 
-        public void AddHandler<T>(params object[] args) where T : ConnectionHandler
+        public void AddHandler<T>() where T : ConnectionHandler
         {
             if (Handler != null)
                 throw new System.Exception("Can't add a handler before removing the existing one.");
-            Handler = (T)Activator.CreateInstance(typeof(T), this, Account, args);
+            Handler = (T)Activator.CreateInstance(typeof(T), this, Account);
         }
 
         public void RemoveHandler()

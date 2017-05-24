@@ -9,15 +9,15 @@ namespace Helios.Engine.Connections
     {
         private MudEntity _player;
 
-        public GameplayHandler(Connection c, Account a, params object[] args) : base(c, a)
-        {
-            _player = (MudEntity)args[0];
-        }
+        public GameplayHandler(Connection c, Account a) : base(c, a) { }
 
-        public override void Enter()
+        public override void Enter(params object[] args)
         {
-            Game.Instance.SendMessage(_account.Id, $"Welcome to the game, {_player.Name}.");
-            Game.Instance.DoAction(new MudAction("enterworld", _player.Id));
+            var playerId = (int)args[0];
+
+            Game.Instance.DoAction(new MudAction("enterworld", playerId));
+            _player = Game.Instance.GetEntityById(playerId);
+            //Game.Instance.SendMessage(_account.Id, $"Welcome to the game, {_player.Name}.");
         }
 
         public override void Handle(string command)

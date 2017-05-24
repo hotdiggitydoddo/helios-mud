@@ -22,7 +22,7 @@ namespace Helios.Engine.Connections
         private MainMenuState _state;
         private List<MudEntity> _characters;
 
-        public MainMenuHandler(Connection c, Account a, params object[] args) : base(c, a, args)
+        public MainMenuHandler(Connection c, Account a) : base(c, a)
         {
             try
             {
@@ -37,7 +37,7 @@ namespace Helios.Engine.Connections
             }
         }
 
-        public override void Enter()
+        public override void Enter(params object[] args)
         {
             _state = MainMenuState.MainMenu;
             _characters = Game.Instance.LoadPlayerCharacters(_account.Id);
@@ -88,8 +88,8 @@ namespace Helios.Engine.Connections
                         {
                             Game.Instance.SendMessage(_account.Id, $"You chose {chosenCharacter.Name}");
                             _connection.RemoveHandler();
-                            _connection.AddHandler<GameplayHandler>(chosenCharacter);
-                            _connection.Handler.Enter();
+                            _connection.AddHandler<GameplayHandler>();
+                            _connection.Handler.Enter(chosenCharacter.Id);
                         }
                     }
                     catch(ArgumentOutOfRangeException)
