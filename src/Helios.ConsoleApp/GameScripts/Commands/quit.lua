@@ -6,10 +6,8 @@ end
 
 function execute(entityId, args)
     if checkUsage(args) then
-        print("args ok");
         Game.Instance.DoAction(MudAction.__new("leaveworld", entityId));
     else
-        print("too many args");
         Game.Instance.DoAction(MudAction.__new("infotoplayer", entityId, 0, "No args needed for 'quit' command."));
     end
 end

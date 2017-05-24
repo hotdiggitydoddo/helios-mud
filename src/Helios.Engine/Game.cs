@@ -193,6 +193,11 @@ namespace Helios.Engine
             _msgHandler.SendToAll(_formatter.Write(message), args);
         }
 
+        private void ExitToMainMenu(int accountId)
+        {
+            _msgHandler.Logout(accountId);
+        }
+
         public List<MudEntity> GetEntitiesInRoom(int roomId, Expression<Func<MudEntity, bool>> predicate = null)
         {
             var room = _rooms[roomId];
@@ -247,9 +252,9 @@ namespace Helios.Engine
             if (character == null) return;
             if (!_entities.ContainsKey(character.Id))
                 _entities.Add(character.Id, character);
+            
             character.Components.Add(new ReporterComponent(character, "reporter", null));
-
-            character.Components.Add(new ReporterComponent(character, "reporter", null));
+            
             
             var roomTrait = character.Traits.Get("room")?.Value;
             var roomId = !string.IsNullOrWhiteSpace(roomTrait) ? int.Parse(roomTrait) : 0;
@@ -271,7 +276,6 @@ namespace Helios.Engine
                 ActionRoomMobs(enterRoom, room.Id);
                 ActionRoomItems(enterRoom, room.Id);
 
-
                 Commands.AssignCommand(character.Id, "quit");
             }
         }
@@ -292,10 +296,12 @@ namespace Helios.Engine
              character.DoAction(leaveZone);
              zone.DoAction(leaveZone);
              ActionRealmPlayers(new MudAction("leaverealm", character.Id));
-
+             
              //remove from game
              room.Entities.Remove(character.Id);
              _entities.Remove(character.Id);
+
+             ExitToMainMenu(int.Parse(character.Traits.Get("accountId").Value));
         }
 
 

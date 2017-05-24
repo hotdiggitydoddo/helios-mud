@@ -47,6 +47,16 @@ namespace Helios.Engine.Containers
             return oldVal;
         }
 
+        public MudTrait Set(string name, string val)
+        {
+            var trait = _traits.SingleOrDefault(x => x.Name == name);
+            if (trait != null)
+                 trait.Value = val;
+            else
+                trait = new MudTrait(name, val);
+            return trait;
+        }
+
         public void Remove(string name)
         {
             var existing = _traits.SingleOrDefault(x => x.Name == name);

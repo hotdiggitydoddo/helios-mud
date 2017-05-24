@@ -102,7 +102,7 @@ namespace Helios.Web
             connection.Handler.Enter();
         }
 
-        public void Logout(string connectionId)
+        public void Quit(string connectionId)
         {
             var conn = _connections.Single(x => x.Id == connectionId);
             if (conn.Handler != null)
@@ -111,6 +111,18 @@ namespace Helios.Web
             }
 
             _connections.RemoveAll(x => x.Id == connectionId);
+        }
+
+        public Task Logout(int accountId)
+        {
+            var conn = _connections.Single(x => x.Account.Id == accountId);
+            if (conn.Handler == null) return Task.FromResult(0);
+
+            conn.RemoveHandler();
+            conn.AddHandler<MainMenuHandler>();
+            conn.Handler.Enter();
+
+            return Task.FromResult(1);
         }
     }
 }

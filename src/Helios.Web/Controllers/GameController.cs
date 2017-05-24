@@ -66,7 +66,7 @@ namespace Helios.Web.Controllers
         [HttpPost]
         public async Task<ActionResult> Logout(GameMessageModel model)
         {
-             _messageHandler.Logout(model.ConnectionId);
+             _messageHandler.Quit(model.ConnectionId);
              return new OkResult();
         }
     }

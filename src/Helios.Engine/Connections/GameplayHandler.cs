@@ -21,7 +21,7 @@ namespace Helios.Engine.Connections
         }
 
         public override void Handle(string command)
-        {
+        {   
             Game.Instance.Commands.Process(_player.Id, command);
         }
 

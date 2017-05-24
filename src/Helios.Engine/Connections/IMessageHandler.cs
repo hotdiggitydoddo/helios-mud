@@ -9,5 +9,6 @@ namespace Helios.Engine.Connections
     {
         Task SendToAll(string message, params string[] args);
         Task SendToAccount(int accountId, string message, params string[] args);
+        Task Logout(int accountId);
     }
 }

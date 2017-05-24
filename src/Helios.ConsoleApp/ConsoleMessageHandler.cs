@@ -82,5 +82,17 @@ namespace Helios.ConsoleApp
             connection.AddHandler<LoginHandler>();
             connection.Handler.Enter();
         }
+
+        public Task Logout(int accountId)
+        {
+            var conn = _connections.Single(x => x.Account.Id == accountId);
+            if (conn.Handler == null) return Task.FromResult(0);
+
+            conn.RemoveHandler();
+            conn.AddHandler<MainMenuHandler>();
+            conn.Handler.Enter();
+
+            return Task.FromResult(1);
+        }
     }
 }
