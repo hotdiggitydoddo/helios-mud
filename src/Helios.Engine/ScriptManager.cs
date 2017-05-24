@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using Helios.Engine.Actions;
 using Helios.Engine.Connections;
 using Helios.Engine.Containers;
 using Helios.Engine.Locations;
@@ -15,7 +16,8 @@ namespace Helios.Engine.Scripting
     {
         Game = 1,
         MudComponent,
-        ActionRunner
+        ActionRunner,
+        MudCommand
     }
 
     public class ScriptManager
@@ -26,16 +28,19 @@ namespace Helios.Engine.Scripting
         private readonly Dictionary<string, string> _gameScripts;
         private readonly Dictionary<string, string> _componentScripts;
         private readonly Dictionary<string, string> _actionRunnerScripts;
+        private readonly Dictionary<string, string> _commandScripts;
 
         private ScriptManager()
         {
             _componentScripts = new Dictionary<string, string>();
             _gameScripts = new Dictionary<string, string>();
             _actionRunnerScripts = new Dictionary<string, string>();
+            _commandScripts = new Dictionary<string, string>();
+
             UserData.RegisterType<Script>();
             UserData.RegisterType<IMessageHandler>();
             UserData.RegisterType<Task>();
-            UserData.RegisterType<Command>();
+            UserData.RegisterType<MudCommand>();
             UserData.RegisterType<ComponentSet>();
             UserData.RegisterType<MudComponent>();
             UserData.RegisterType<TraitSet>();
@@ -55,6 +60,7 @@ namespace Helios.Engine.Scripting
             //UserData.RegisterType<List<MudPortal>>();
             UserData.RegisterType<List<MudZone>>();
             UserData.RegisterType<MudWorld>();
+            UserData.RegisterType<MudAction>();
         }
 
         // public bool AddScript(string name, string lua)
@@ -82,6 +88,8 @@ namespace Helios.Engine.Scripting
                         return _gameScripts[name];
                     case ScriptType.MudComponent:
                         return _componentScripts[name];
+                    case ScriptType.MudCommand:
+                        return _commandScripts[name];
                     default:
                         return null;
                 }
@@ -91,6 +99,11 @@ namespace Helios.Engine.Scripting
                 //TODO: log exception
                 throw new KeyNotFoundException($"The script \"{name}\" was not found.");
             }
+        }
+
+        public Dictionary<string, string> GetCommandScripts()
+        {
+            return new Dictionary<string, string>(_commandScripts);
         }
 
         public Dictionary<string, string> GetComponentScripts()
@@ -116,6 +129,10 @@ namespace Helios.Engine.Scripting
                     files = Directory.GetFiles(Path.Combine("GameScripts", "Components"), "*.lua", SearchOption.AllDirectories);
                     _componentScripts.Clear();
                 break;
+                 case ScriptType.MudCommand:
+                    files = Directory.GetFiles(Path.Combine("GameScripts", "Commands"), "*.lua", SearchOption.AllDirectories);
+                    _commandScripts.Clear();
+                break;
             }
 
             foreach (var file in files)
@@ -128,6 +145,8 @@ namespace Helios.Engine.Scripting
                     _gameScripts.Add(name, script);
                 else if (type == ScriptType.MudComponent)
                     _componentScripts.Add(name, script);
+                else if (type == ScriptType.MudCommand)
+                    _commandScripts.Add(name, script);
                 else
                     _actionRunnerScripts.Add(name, script);
             }

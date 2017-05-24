@@ -11,11 +11,12 @@ namespace Helios.Data
         public DbSet<Entity> Entities {get; set;}
         public DbSet<Trait> Traits {get; set;}
         public DbSet<Account_Entity> Characters {get; set;}
+        public DbSet<Entity_Command> Entity_Commands {get; set;}
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            //optionsBuilder.UseSqlServer("Data Source=(localdb)\\ProjectsV13;Initial Catalog=AADb;Integrated Security=True;Persist Security Info=False");
-            optionsBuilder.UseNpgsql("Server=127.0.0.1;Port=5432;Database=HeliosDb;User Id=postgres;Password=kewlio14;");
+            optionsBuilder.UseSqlServer("Data Source=(localdb)\\ProjectsV13;Initial Catalog=HeliosDb;Integrated Security=True;Persist Security Info=False");
+            //optionsBuilder.UseNpgsql("Server=127.0.0.1;Port=5432;Database=HeliosDb;User Id=postgres;Password=kewlio14;");
         }
 
         protected override void OnModelCreating(ModelBuilder builder)

@@ -30,23 +30,27 @@ namespace Helios.Engine
         public static Game Instance;
         public long TimeRunning { get; private set; }
         public long CurrentTime { get; private set; }
+        public CommandManager Commands {get;}
 
         public Game(IEntityFactory entityFactory, IOutputFormatter formatter)
         {
             Instance = this;
+            _formatter = formatter;
+            
             _entities = new Dictionary<int, MudEntity>();
             _rooms = new Dictionary<int, MudRoom>();
             _zones = new Dictionary<int, MudZone>();
             _portals = new Dictionary<int, MudPortal>();
             _portalEntries = new Dictionary<int, MudPortalEntry>();
 
-
             _entityFactory = entityFactory;
-            _formatter = formatter;
 
             ScriptManager.Instance.RefreshScripts(ScriptType.Game);
             ScriptManager.Instance.RefreshScripts(ScriptType.MudComponent);
+            ScriptManager.Instance.RefreshScripts(ScriptType.MudCommand);
             ComponentManager.Instance.RefreshAllComponents();
+            Commands = new CommandManager();
+            Commands.LoadAllCommands();
         }
 
         public void Init(IMessageHandler handler)
@@ -118,7 +122,6 @@ namespace Helios.Engine
             _portalEntries.Add(p1e2.Id, p1e2);
             _portalEntries.Add(p2e1.Id, p2e1);
             _portalEntries.Add(p2e2.Id, p2e2);
-
         }
 
         public void Start()
@@ -136,6 +139,8 @@ namespace Helios.Engine
                 Login(action);
             else if (type == "leaveworld")
                 Logout(action);
+            else if (type == "infotoplayer")
+                GameToPlayer(action);
             // else if (type == "attemptgetitem")
             //     GetItem(action.SenderId, action.ReceiverId, action.OtherEntity1);
 
@@ -265,6 +270,9 @@ namespace Helios.Engine
 
                 ActionRoomMobs(enterRoom, room.Id);
                 ActionRoomItems(enterRoom, room.Id);
+
+
+                Commands.AssignCommand(character.Id, "quit");
             }
         }
 
@@ -375,6 +383,15 @@ namespace Helios.Engine
             newRoom.DoAction(enterRoom);
             ActionRoomMobs(enterRoom, newRoom.Id);
             ActionRoomItems(enterRoom, newRoom.Id);
+        }
+
+        private void GameToPlayer(MudAction action)
+        {
+             var character = _entities[action.SenderId];
+             var acctId = character.Traits.Get("accountId")?.Value;
+             if (string.IsNullOrWhiteSpace("accountId"))
+                return;
+             SendMessage(int.Parse(acctId), action.Args[0]);
         }
 
         private void Transfer(MudAction action)

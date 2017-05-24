@@ -2,7 +2,7 @@ using MoonSharp.Interpreter;
 
 namespace Helios.Engine.Objects
 {
-    public class Command
+    public class MudCommand
     {
         private readonly Script _script;
 
@@ -17,7 +17,7 @@ namespace Helios.Engine.Objects
             return _script.Call(_script.Globals["execute"], args).Boolean;
         }
 
-        public Command(int entityId, string name, string usage, string description, Script script)
+        public MudCommand(int entityId, string name, string usage, string description, Script script)
         {
             EntityId = entityId;
             Name = name;
