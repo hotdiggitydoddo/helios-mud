@@ -52,7 +52,7 @@ namespace Helios.Web.Controllers
             var user = await _userMgr.GetUserAsync(HttpContext.User);
             var account = _accounts.Find(x => x.UserId == user.Id).SingleOrDefault();
         
-            //if (user.Account == null)
+            //if (user.Account == null)s
             //{
             //    user.Account = new Account { UserId = user.Id };
             //    var res = await _userMgr.UpdateAsync(user);
@@ -61,6 +61,13 @@ namespace Helios.Web.Controllers
             _messageHandler.Login(model.ConnectionId, user.Account);
 
             return new OkResult();
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> Logout(GameMessageModel model)
+        {
+             _messageHandler.Logout(model.ConnectionId);
+             return new OkResult();
         }
     }
 }

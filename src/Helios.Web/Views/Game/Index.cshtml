@@ -103,8 +103,24 @@
                 list.appendChild(el)
                 $('#messages').animate({ "scrollTop": $('#messages')[0].scrollHeight }, "fast");
             }
-    });
 
+            window.onunload = function() {
+                $.post("@Url.Action("Logout")", { connectionId: connection.connectionId }, function (res) {
+                    console.log(res);
+                });
+            }
+
+            $(window).on("beforeunload", function() {
+                $.ajax("@Url.Action("Logout")", {
+                    async: false,
+                    type: "POST",
+                    data: { connectionId: connection.connectionId },
+                    success: function(event) {
+                        console.log("Ajax request executed");
+                    }
+                });
+            });
+    });
     </script>
 
 }

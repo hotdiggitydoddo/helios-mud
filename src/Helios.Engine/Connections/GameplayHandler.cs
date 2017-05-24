@@ -22,12 +22,12 @@ namespace Helios.Engine.Connections
 
         public override void Handle(string command)
         {
-            //throw new NotImplementedException();
+            //
         }
 
         public override void Leave()
         {
-            //throw new NotImplementedException();
+            Game.Instance.DoAction(new MudAction("leaveworld", _player.Id));
         }
     }
 }

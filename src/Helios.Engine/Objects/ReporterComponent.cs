@@ -19,6 +19,11 @@ namespace Helios.Engine.Objects
                 var mob = Game.Instance.GetEntityById(action.SenderId);
                 Game.Instance.SendMessage(_acctId, $"{mob.Name} has entered the realm.");
             }
+            else if (action.Type == "leaverealm")
+            {
+                var mob = Game.Instance.GetEntityById(action.SenderId);
+                Game.Instance.SendMessage(_acctId, $"{mob.Name} has left the realm.");
+            }
             return true;
         }
 

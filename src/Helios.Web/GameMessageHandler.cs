@@ -34,8 +34,17 @@ namespace Helios.Web
 
         public override async Task OnDisconnected(WebSocket socket)
         {
-            var connectionId = WebSocketConnectionManager.GetId(socket);
-            _connections.RemoveAll(x => x.Id == connectionId);
+            // var connectionId = WebSocketConnectionManager.GetId(socket);
+
+            // var conn = _connections.Single(x => x.Id == connectionId);
+            // if (conn.Handler != null)
+            // {
+            //     conn.Handler.Leave();
+            // }
+
+            
+
+            // _connections.RemoveAll(x => x.Id == connectionId);
 
             await base.OnDisconnected(socket);
         }
@@ -84,7 +93,6 @@ namespace Helios.Web
             if (_connections.Any(x => x.Account.Id == account.Id))
             {
                await InvokeClientMethodAsync(connectionId, "receiveMessage", new[] { "<span style=\"color:red;\">You are already connected to the game in another browser window.  Please close this window and return to the original one.</span>"});
-               await OnDisconnected(WebSocketConnectionManager.GetSocketById(connectionId));
                return;
             }
 
@@ -92,6 +100,17 @@ namespace Helios.Web
             _connections.Add(connection);
             connection.AddHandler<LoginHandler>();
             connection.Handler.Enter();
+        }
+
+        public void Logout(string connectionId)
+        {
+            var conn = _connections.Single(x => x.Id == connectionId);
+            if (conn.Handler != null)
+            {
+                conn.Handler.Leave();
+            }
+
+            _connections.RemoveAll(x => x.Id == connectionId);
         }
     }
 }

@@ -16,7 +16,7 @@ namespace Helios.Data
         {
             
             //optionsBuilder.UseSqlServer("Data Source=(localdb)\\ProjectsV13;Initial Catalog=AADb;Integrated Security=True;Persist Security Info=False");
-            optionsBuilder.UseNpgsql("Server=127.0.0.1;Port=5432;Database=HeliosDb;User Id=postgres;Password=xxxxx;");
+            optionsBuilder.UseNpgsql("Server=127.0.0.1;Port=5432;Database=HeliosDb;User Id=postgres;Password=kewlio14;");
         }
 
         protected override void OnModelCreating(ModelBuilder builder)
