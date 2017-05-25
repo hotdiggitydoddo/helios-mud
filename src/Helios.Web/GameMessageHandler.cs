@@ -77,6 +77,8 @@ namespace Helios.Web
                 if (message == "#")
                 {
                     Engine.Scripting.ScriptManager.Instance.RefreshScripts(Engine.Scripting.ScriptType.Game);
+                    Engine.Scripting.ScriptManager.Instance.RefreshScripts(Engine.Scripting.ScriptType.MudCommand);
+                     Game.Instance.Commands.LoadAllCommands();
                     await InvokeClientMethodAsync(conn.Id, "receiveMessage", new[] { "DEBUG: refreshed game scripts." });
                 }
                 else

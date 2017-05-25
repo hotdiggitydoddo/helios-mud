@@ -26,7 +26,7 @@ namespace Helios.Engine.UI
             }
 
             input = input.Replace("<#>", "</span>");
-            input = input.Replace("\n", "<br />");
+            input = input.Replace("\n", "</div><div>");
             input = input.Replace("<tab>", "<span style=\"margin-right: 25px\"></span>");
         }
     }

@@ -27,8 +27,8 @@
             "stopAtEntry": false,
             "internalConsoleOptions": "openOnSessionStart",
             "launchBrowser": {
-                "enabled": true,
-                "args": "${auto-detect-url}",
+                "enabled": false,
+                "args": "${auto-detect-url}", 
                 "windows": {
                     "command": "cmd.exe",
                     "args": "/C start ${auto-detect-url}"

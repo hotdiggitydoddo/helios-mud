@@ -30,13 +30,13 @@ namespace Helios.Engine
         public static Game Instance;
         public long TimeRunning { get; private set; }
         public long CurrentTime { get; private set; }
-        public CommandManager Commands {get;}
+        public CommandManager Commands { get; }
 
         public Game(IEntityFactory entityFactory, IOutputFormatter formatter)
         {
             Instance = this;
             _formatter = formatter;
-            
+
             _entities = new Dictionary<int, MudEntity>();
             _rooms = new Dictionary<int, MudRoom>();
             _zones = new Dictionary<int, MudZone>();
@@ -62,7 +62,7 @@ namespace Helios.Engine
         void SetupWorld()
         {
             var zone = new MudZone(1, "The Enchanted Forest");
-            
+
             var room1 = new MudRoom(1, 1, "Western Clearing");
             var room2 = new MudRoom(2, 1, "Eastern Thicket");
             var room3 = new MudRoom(3, 1, "Camp");
@@ -95,13 +95,13 @@ namespace Helios.Engine
             var p1 = new MudPortal(1, 3, "Passageway 1");
             var p1e1 = new MudPortalEntry(1, room3.Id, room1.Id, "West");
             var p1e2 = new MudPortalEntry(2, room1.Id, room3.Id, "East");
-            p1.Entries.AddRange(new [] { p1e1.Id, p1e2.Id });
+            p1.Entries.AddRange(new[] { p1e1.Id, p1e2.Id });
 
             //camp --> east
             var p2 = new MudPortal(2, 3, "Passageway 2");
             var p2e1 = new MudPortalEntry(3, room3.Id, room2.Id, "East");
             var p2e2 = new MudPortalEntry(4, room2.Id, room3.Id, "West");
-            p2.Entries.AddRange(new [] { p1e1.Id, p1e2.Id });
+            p2.Entries.AddRange(new[] { p1e1.Id, p1e2.Id });
 
             room3.Portals.Add(p1.Id);
             room3.Portals.Add(p2.Id);
@@ -110,7 +110,7 @@ namespace Helios.Engine
 
             room2.Portals.Add(p2.Id);
 
-            zone.Rooms.AddRange(new []{ room1.Id, room2.Id, room3.Id });
+            zone.Rooms.AddRange(new[] { room1.Id, room2.Id, room3.Id });
 
             _zones.Add(zone.Id, zone);
             _rooms.Add(room1.Id, room1);
@@ -143,11 +143,13 @@ namespace Helios.Engine
                 GameToPlayer(action);
             else if (type == "look")
                 RouteActionToEntity(action.SenderId, action);
-                
+            else if (type == "attemptsay")
+                Say(action);
+
             // else if (type == "attemptgetitem")
             //     GetItem(action.SenderId, action.ReceiverId, action.OtherEntity1);
 
-            //custom action
+                //custom action
             else if (_actionRunners.ContainsKey(type))
                 _actionRunners[type].Run(action);
         }
@@ -174,7 +176,7 @@ namespace Helios.Engine
 
         public MudPortal GetPortalById(int id)
         {
-             return _portals.ContainsKey(id) ? _portals[id] : null;
+            return _portals.ContainsKey(id) ? _portals[id] : null;
         }
         public MudRoom GetRoomById(int roomId)
         {
@@ -249,16 +251,25 @@ namespace Helios.Engine
             _updating = false;
         }
 
+        private void Say(MudAction action)
+        {
+            //TODO: check if entity CAN talk
+
+            var mob = _entityFactory.GetEntityById(action.SenderId);
+            var say = new MudAction("say", mob.Id, 0, 0, action.Args[0], mob.Name);
+            ActionRoomMobs(say, GetRoomWithEntity(mob.Id).Id);
+        }
+
         private void Login(MudAction action)
         {
             var character = _entityFactory.GetEntityById(action.SenderId);
             if (character == null) return;
             if (!_entities.ContainsKey(character.Id))
                 _entities.Add(character.Id, character);
-            
+
             character.Components.Add(new ReporterComponent(character, "reporter", null));
-            
-            
+
+
             var roomTrait = character.Traits.Get("room")?.Value;
             var roomId = !string.IsNullOrWhiteSpace(roomTrait) ? int.Parse(roomTrait) : 0;
             if (roomId > 0)
@@ -267,11 +278,11 @@ namespace Helios.Engine
                 room.Entities.Add(character.Id);
 
                 ActionRealmPlayers(new MudAction("enterrealm", character.Id));
-                
+
                 var zone = _zones[room.Zone];
                 var enterZone = new MudAction("enterzone", character.Id);
                 var enterRoom = new MudAction("enterroom", character.Id, 0);
-                
+
                 zone.DoAction(enterRoom);
                 character.DoAction(enterZone);
                 room.DoAction(enterRoom);
@@ -281,31 +292,33 @@ namespace Helios.Engine
 
                 Commands.AssignCommand(character.Id, "quit");
                 Commands.AssignCommand(character.Id, "look");
+                Commands.AssignCommand(character.Id, "say");
+                
             }
         }
 
         private void Logout(MudAction action)
         {
-             var character = _entityFactory.GetEntityById(action.SenderId);
-             var room = GetRoomWithEntity(character.Id);
-             var zone = _zones[room.Zone];
+            var character = _entityFactory.GetEntityById(action.SenderId);
+            var room = GetRoomWithEntity(character.Id);
+            var zone = _zones[room.Zone];
 
-             //tell everyone about it
-             var leaveRoom = new MudAction("leaveroom", character.Id, 0);
-             ActionRoomItems(leaveRoom, room.Id);
-             ActionRoomMobs(leaveRoom, room.Id);
-             room.DoAction(leaveRoom);
+            //tell everyone about it
+            var leaveRoom = new MudAction("leaveroom", character.Id, 0);
+            ActionRoomItems(leaveRoom, room.Id);
+            ActionRoomMobs(leaveRoom, room.Id);
+            room.DoAction(leaveRoom);
 
-             var leaveZone = new MudAction("leavezone", character.Id);
-             character.DoAction(leaveZone);
-             zone.DoAction(leaveZone);
-             ActionRealmPlayers(new MudAction("leaverealm", character.Id));
-             
-             //remove from game
-             room.Entities.Remove(character.Id);
-             _entities.Remove(character.Id);
+            var leaveZone = new MudAction("leavezone", character.Id);
+            character.DoAction(leaveZone);
+            zone.DoAction(leaveZone);
+            ActionRealmPlayers(new MudAction("leaverealm", character.Id));
 
-             ExitToMainMenu(int.Parse(character.Traits.Get("accountId").Value));
+            //remove from game
+            room.Entities.Remove(character.Id);
+            _entities.Remove(character.Id);
+
+            ExitToMainMenu(int.Parse(character.Traits.Get("accountId").Value));
         }
 
 
@@ -397,11 +410,11 @@ namespace Helios.Engine
 
         private void GameToPlayer(MudAction action)
         {
-             var character = _entities[action.SenderId];
-             var acctId = character.Traits.Get("accountId")?.Value;
-             if (string.IsNullOrWhiteSpace("accountId"))
+            var character = _entities[action.SenderId];
+            var acctId = character.Traits.Get("accountId")?.Value;
+            if (string.IsNullOrWhiteSpace("accountId"))
                 return;
-             SendMessage(int.Parse(acctId), action.Args[0]);
+            SendMessage(int.Parse(acctId), action.Args[0]);
         }
 
         private void Transfer(MudAction action)
@@ -468,7 +481,7 @@ namespace Helios.Engine
         private void ActionRealmPlayers(MudAction action)
         {
             var players = GetAllPlayers();
-            foreach(var player in players)
+            foreach (var player in players)
                 player.DoAction(action);
         }
 

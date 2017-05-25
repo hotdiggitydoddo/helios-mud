@@ -32,6 +32,8 @@ namespace Helios.Engine.Objects
                 EnterRoom(action);
             else if (action.Type == "look")
                 EnterRoom(action);
+            else if (action.Type == "say")
+                Game.Instance.SendMessage(_acctId, $"{action.Args[1]} says, \"{action.Args[0]}\"");
             return true;
         }
 

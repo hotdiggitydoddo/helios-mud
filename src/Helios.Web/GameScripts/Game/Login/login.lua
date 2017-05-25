@@ -6,7 +6,7 @@
 --end
 
 function getTitle()
-	return "Welcome to <#yellow>Arcana Aeterna<#> <#cyan>LUA<#> style!\n";
+	return "Welcome to <#yellow>Arcana Aeterna<#> <#cyan><em>LUA<#> style!</em>\n" .. "Hold onto your hats!  It's gonna be fun!";
 end
 
 function motd()
