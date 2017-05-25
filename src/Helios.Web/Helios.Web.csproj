@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Views\Game\" />
+    <Folder Include="GameScripts\Commands\" />
   </ItemGroup>
   <ItemGroup>
     <None Update="GameScripts\Logic\login.lua">

@@ -1,0 +1,14 @@
+﻿<Properties StartupConfiguration="{CDF1C679-5933-4035-B746-7035E94053B3}|Default">
+  <MonoDevelop.Ide.Workbench ActiveDocument="src/Helios.Web/Startup.cs">
+    <Files>
+      <File FileName="src/Helios.Web/Startup.cs" Line="1" Column="1" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MultiItemStartupConfigurations />
+  <MonoDevelop.Ide.ItemProperties.src.Helios.Web PreferredExecutionTarget="MonoDevelop.Default" />
+</Properties>

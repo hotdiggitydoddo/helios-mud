@@ -17,7 +17,6 @@ namespace Helios.Engine.Connections
 
             Game.Instance.DoAction(new MudAction("enterworld", playerId));
             _player = Game.Instance.GetEntityById(playerId);
-            //Game.Instance.SendMessage(_account.Id, $"Welcome to the game, {_player.Name}.");
         }
 
         public override void Handle(string command)

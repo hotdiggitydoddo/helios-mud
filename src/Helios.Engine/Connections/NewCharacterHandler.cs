@@ -71,7 +71,8 @@ namespace Helios.Engine.Connections
                     Game.Instance.SendMessage(_account.Id, _script.Call(_script.Globals["printRaces"]).String);
 
                     _newChar.Traits.Add("room", "3");
-
+                    
+                    _newChar.Traits.Add("accountId", _account.Id.ToString());
                     _newChar = Game.Instance.CreatePlayerCharacter(_account.Id, _newChar);
 
                     _state = NewCharState.ChoosingRace;
