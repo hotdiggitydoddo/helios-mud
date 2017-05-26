@@ -13,7 +13,7 @@ namespace Helios.Engine.Factories
     {
         private Dictionary<int, List<string>> _entityCommands;
         private Dictionary<string, Script> _commandSet;
-         
+
         public CommandManager()
         {
             _commandSet = new Dictionary<string, Script>();
@@ -36,24 +36,24 @@ namespace Helios.Engine.Factories
         {
             _commandSet.Clear();
             var allScripts = ScriptManager.Instance.GetCommandScripts();
-            
-            foreach(var kvp in allScripts)
-            {
-                 var script = new Script();
-                 //script.Globals["Command"] = typeof(MudCommand);
-                 script.Globals["Game"] = typeof(Game);
-                
-                    script.Globals["MudAction"] = typeof(MudAction);
 
-              
+            foreach (var kvp in allScripts)
+            {
+                var script = new Script();
+                //script.Globals["Command"] = typeof(MudCommand);
+                script.Globals["Game"] = typeof(Game);
+
+                script.Globals["MudAction"] = typeof(MudAction);
+
+
                 try
                 {
-                 script.DoString(kvp.Value);
+                    script.DoString(kvp.Value);
 
                 }
-                  catch(Exception ex)
+                catch (Exception ex)
                 {
-                    
+
                 }
                 _commandSet.Add(kvp.Key, script);
             }
@@ -62,7 +62,7 @@ namespace Helios.Engine.Factories
         public void AssignCommand(int entityId, string cmdName)
         {
             if (!_entityCommands.ContainsKey(entityId))
-                _entityCommands.Add(entityId, new List<string>{ cmdName });
+                _entityCommands.Add(entityId, new List<string> { cmdName });
             else if (!_entityCommands[entityId].Contains(cmdName))
                 _entityCommands[entityId].Add(cmdName);
         }
@@ -76,17 +76,17 @@ namespace Helios.Engine.Factories
 
         public void Process(int entityId, string input)
         {
-            if (!Parse(entityId, ref input))
-                return;
-            
             var parts = input.Trim().Split(' ').ToList();
             var verb = parts[0].ToLower();
             parts.RemoveAt(0);
+            
+            if (!Parse(entityId, ref verb))
+                return;
 
-            Execute(entityId, verb, parts.ToArray());
+            Execute(entityId, verb, string.Join(" ", parts));
         }
 
-        private bool Parse(int entityId, ref string input)
+        private bool Parse(int entityId, ref string verb)
         {
             //this method should really return a custom object that has the command name and
             //typed and named arguments
@@ -94,11 +94,8 @@ namespace Helios.Engine.Factories
             if (!_entityCommands.ContainsKey(entityId))
                 return false;
 
-            var parts = input.Trim().Split(' ');
-            var verb = parts[0].ToLower();
-
             if (verb == "commands")
-            {   
+            {
                 //need to communicate available commands to player.
                 Game.Instance.DoAction(new MudAction("infotoplayer", entityId, 0, string.Join(", ", GetCommands(entityId))));
                 return false;
@@ -121,7 +118,7 @@ namespace Helios.Engine.Factories
             }
             catch (ScriptRuntimeException ex)
             {
-                
+
             }
         }
     }

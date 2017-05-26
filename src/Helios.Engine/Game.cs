@@ -93,15 +93,15 @@ namespace Helios.Engine
 
             //camp --> west
             var p1 = new MudPortal(1, 3, "Passageway 1");
-            var p1e1 = new MudPortalEntry(1, room3.Id, room1.Id, "West");
-            var p1e2 = new MudPortalEntry(2, room1.Id, room3.Id, "East");
-            p1.Entries.AddRange(new[] { p1e1.Id, p1e2.Id });
+            var p1e1 = new MudPortalEntry(1, room3.Id, room1.Id, "west");
+            var p1e2 = new MudPortalEntry(2, room1.Id, room3.Id, "east");
+            p1.Entries.AddRange(new[] { p1e1, p1e2 });
 
             //camp --> east
             var p2 = new MudPortal(2, 3, "Passageway 2");
-            var p2e1 = new MudPortalEntry(3, room3.Id, room2.Id, "East");
-            var p2e2 = new MudPortalEntry(4, room2.Id, room3.Id, "West");
-            p2.Entries.AddRange(new[] { p1e1.Id, p1e2.Id });
+            var p2e1 = new MudPortalEntry(3, room3.Id, room2.Id, "east");
+            var p2e2 = new MudPortalEntry(4, room2.Id, room3.Id, "west");
+            p2.Entries.AddRange(new[] { p2e1, p2e2 });
 
             room3.Portals.Add(p1.Id);
             room3.Portals.Add(p2.Id);
@@ -145,6 +145,8 @@ namespace Helios.Engine
                 RouteActionToEntity(action.SenderId, action);
             else if (type == "attemptsay")
                 Say(action);
+            else if (type == "attemptenterportal")
+                EnterPortal(action);
 
             // else if (type == "attemptgetitem")
             //     GetItem(action.SenderId, action.ReceiverId, action.OtherEntity1);
@@ -182,6 +184,18 @@ namespace Helios.Engine
         {
             return _rooms.ContainsKey(roomId) ? _rooms[roomId] : null;
         }
+
+        public List<MudPortal> GetRoomPortals(int roomId)
+        {
+            return _portals.Values.Where(x => x.Room == roomId).ToList();
+        }
+        // public List<MudPortal> GetRoomPortals(int roomId, string direction = null)
+        // {
+            
+        //     return string.IsNullOrWhiteSpace(direction)
+        //         ? _portals.Values.Where(x => x.Room == roomId).ToList()
+        //         _portalEntries.First().Value.
+        // }
 
         public MudZone GetZoneById(int zoneId)
         {
@@ -293,7 +307,7 @@ namespace Helios.Engine
                 Commands.AssignCommand(character.Id, "quit");
                 Commands.AssignCommand(character.Id, "look");
                 Commands.AssignCommand(character.Id, "say");
-                
+                Commands.AssignCommand(character.Id, "west");
             }
         }
 

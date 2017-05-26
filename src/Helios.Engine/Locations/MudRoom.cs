@@ -22,5 +22,20 @@ namespace Helios.Engine.Locations
             Portals = new List<int>();
             Zone = zone;
         }
+
+        public MudPortal GetPortalWithDirection(string direction)
+        {
+            var portals = Game.Instance.GetRoomPortals(Id);
+            if (portals == null) return null;
+            try
+            {
+                var entry = portals.SingleOrDefault(x => x.Entries.Any(e => e.StartRoom == Id && e.Direction == direction));
+                return entry;
+            }
+            catch(System.Exception ex)
+            {
+                return null;
+            }
+        }
     }
 }

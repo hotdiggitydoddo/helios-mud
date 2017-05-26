@@ -2,18 +2,34 @@ using Helios.Engine.Objects;
 
 namespace Helios.Engine.Locations
 {
-    public class MudPortalEntry : MudEntity
+    // public class MudPortalEntry : MudEntity
+    // {
+    //     public MudPortalEntry(int id, int startRoom, int endRoom, string direction, string name = null) : base(id, name)
+    //     {
+    //         StartRoom = startRoom;
+    //         EndRoom = endRoom;
+    //         Direction = direction;
+    //     }
+
+    //     public int StartRoom {get;}             // starting room
+    //     public int EndRoom {get;}      // ending room
+    //     public string Direction {get;}      // name of the direction used to enter portal
+    // }
+
+    public class MudPortalEntry
     {
-        public MudPortalEntry(int id, int startRoom, int endRoom, string direction, string name = null) : base(id, name)
-        {
+        public int Id {get;}
+        public int StartRoom {get;}             // starting room
+        public int EndRoom {get;}      // ending room
+        public string Direction {get;}
+
+         public MudPortalEntry(int id, int startRoom, int endRoom, string direction)
+         {
+            Id = id;
             StartRoom = startRoom;
             EndRoom = endRoom;
             Direction = direction;
-        }
-
-        public int StartRoom {get;}             // starting room
-        public int EndRoom {get;}      // ending room
-        public string Direction {get;}      // name of the direction used to enter portal
+         }
     }
 
 }
