@@ -64,7 +64,9 @@ namespace Helios.Engine
             var zone = new MudZone(1, "The Enchanted Forest");
 
             var room1 = new MudRoom(1, 1, "Western Clearing");
+            room1.Traits.Add("description", "The passageway gives way to an expanse of land unobstructed by trees of any shape or size.");
             var room2 = new MudRoom(2, 1, "Eastern Thicket");
+            room2.Traits.Add("description", "You find yourself in the midst of a densely packed bushes and shrubs.");
             var room3 = new MudRoom(3, 1, "Camp");
             room3.Traits.Add("description", "Surrounded by thick shrubbery and large, looming pine trees lies a modest encampment.  At its center, a fire crackles softly.");
 
@@ -92,13 +94,13 @@ namespace Helios.Engine
 
 
             //camp --> west
-            var p1 = new MudPortal(1, 3, "Passageway 1");
+            var p1 = new MudPortal(1001, "Passageway 1");
             var p1e1 = new MudPortalEntry(1, room3.Id, room1.Id, "west");
             var p1e2 = new MudPortalEntry(2, room1.Id, room3.Id, "east");
             p1.Entries.AddRange(new[] { p1e1, p1e2 });
 
             //camp --> east
-            var p2 = new MudPortal(2, 3, "Passageway 2");
+            var p2 = new MudPortal(1002, "Passageway 2");
             var p2e1 = new MudPortalEntry(3, room3.Id, room2.Id, "east");
             var p2e2 = new MudPortalEntry(4, room2.Id, room3.Id, "west");
             p2.Entries.AddRange(new[] { p2e1, p2e2 });
@@ -187,7 +189,7 @@ namespace Helios.Engine
 
         public List<MudPortal> GetRoomPortals(int roomId)
         {
-            return _portals.Values.Where(x => x.Room == roomId).ToList();
+            return _portals.Values.Where(x => x.HasEntriesWithRoom(roomId)).ToList();
         }
         // public List<MudPortal> GetRoomPortals(int roomId, string direction = null)
         // {
@@ -229,7 +231,7 @@ namespace Helios.Engine
 
         public MudRoom GetRoomWithEntity(int entityId)
         {
-            var mob = _entityFactory.GetEntityById(entityId);
+            var mob = _entities[entityId];
             if (mob == null) return null;
             var roomTrait = mob.Traits.Get("room")?.Value;
             var roomId = !string.IsNullOrWhiteSpace(roomTrait) ? int.Parse(roomTrait) : 0;
@@ -268,8 +270,7 @@ namespace Helios.Engine
         private void Say(MudAction action)
         {
             //TODO: check if entity CAN talk
-
-            var mob = _entityFactory.GetEntityById(action.SenderId);
+            var mob = _entities[action.SenderId];
             var say = new MudAction("say", mob.Id, 0, 0, action.Args[0], mob.Name);
             ActionRoomMobs(say, GetRoomWithEntity(mob.Id).Id);
         }
@@ -308,6 +309,7 @@ namespace Helios.Engine
                 Commands.AssignCommand(character.Id, "look");
                 Commands.AssignCommand(character.Id, "say");
                 Commands.AssignCommand(character.Id, "west");
+                Commands.AssignCommand(character.Id, "east");
             }
         }
 

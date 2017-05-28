@@ -1,14 +1,14 @@
 --QUIT (quits the game)
 
 function checkUsage(args)
-    return tablelength(args) == 0;
+    return args[1] == "";
 end
 
 function execute(entityId, args)
     if checkUsage(args) then
         Game.Instance.DoAction(MudAction.__new("look", entityId));
     else
-        Game.Instance.DoAction(MudAction.__new("infotoplayer", entityId, 0, "No args needed for 'quit' command."));
+        Game.Instance.DoAction(MudAction.__new("infotoplayer", entityId, 0, "No args needed for 'look ' command yet."));
     end
 end
 

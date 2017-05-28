@@ -1,7 +1,7 @@
 --QUIT (quits the game)
 
 function checkUsage(args)
-    return tablelength(args) == 0;
+    return args[1] == "";
 end
 
 function execute(entityId, args)
