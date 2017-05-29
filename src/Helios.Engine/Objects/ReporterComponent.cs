@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using Helios.Engine.Locations;
 using MoonSharp.Interpreter;
+using System.Linq;
 
 namespace Helios.Engine.Objects
 {
@@ -76,13 +77,24 @@ namespace Helios.Engine.Objects
         private void SeeRoomItems(MudRoom room)
         {
             var items = Game.Instance.GetEntitiesInRoom(room.Id, x => !x.Traits.Has("race") && x.Traits.Has("item"));
+            if (!items.Any())
+            {
+                Game.Instance.SendMessage(_acctId, "There is nothing of note here.");
+                return;
+            }
+
             var sb = new StringBuilder();
             Game.Instance.SendMessage(_acctId, $"You see {ConcatEntities(items)} on the ground.");
         }
 
         private void SeeRoomMobs(MudRoom room)
         {
-            var mobs = Game.Instance.GetEntitiesInRoom(room.Id, x => x.Traits.Has("race") && !x.Traits.Has("item"));
+            var mobs = Game.Instance.GetEntitiesInRoom(room.Id, x => x.Traits.Has("race") && !x.Traits.Has("item") && x.Id != Owner.Id);
+            if (!mobs.Any())
+            {
+                Game.Instance.SendMessage(_acctId, "There are no signs of life here.");
+                return;
+            }
             var sb = new StringBuilder();
             var verb = mobs.Count > 2 ? "are" : "is";
             Game.Instance.SendMessage(_acctId, $"{ConcatEntities(mobs)} {verb} here with you.");
@@ -114,7 +126,7 @@ namespace Helios.Engine.Objects
             {
                 if (entities[i].Id == Owner.Id)
                     continue;
-                if (i == entities.Count - 2 && i != 0)
+                if (i == entities.Count - 1 && i != 0)
                     sb.Append("and ").Append(entities[i].Name);
                 else
                     sb.Append(entities[i].Name).Append(", ");
