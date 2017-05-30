@@ -17,6 +17,7 @@ namespace Helios.Engine
     {
         private IOutputFormatter _formatter;
         private IMessageHandler _msgHandler;
+        private TimerRegistry _timerRegistry;
         private Dictionary<string, ActionRunner> _actionRunners;
         private Dictionary<int, MudEntity> _entities;
         private Dictionary<int, MudRoom> _rooms;
@@ -36,6 +37,7 @@ namespace Helios.Engine
         {
             Instance = this;
             _formatter = formatter;
+            _timerRegistry = new TimerRegistry();
 
             _entities = new Dictionary<int, MudEntity>();
             _rooms = new Dictionary<int, MudRoom>();
@@ -247,7 +249,7 @@ namespace Helios.Engine
 
         private void Tick(long elapsedTime)
         {
-
+            _timerRegistry.Dispatch();
         }
 
         private void OnTimerElapsed(object state)
@@ -310,6 +312,8 @@ namespace Helios.Engine
                 Commands.AssignCommand(character.Id, "say");
                 Commands.AssignCommand(character.Id, "west");
                 Commands.AssignCommand(character.Id, "east");
+
+                _timerRegistry.Add(new TimedMudAction(DateTime.UtcNow.AddSeconds(5).Ticks, "infotoplayer", character.Id, "This is an action delayed by 5 seconds."));
             }
         }
 

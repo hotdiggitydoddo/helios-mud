@@ -17,6 +17,7 @@ namespace Helios.Engine.Actions
         {
             var script = new Script();
             script.Globals["MudAction"] = typeof(MudAction);
+            script.Globals["TimedMudAction"] = typeof(TimedMudAction);
             script.DoString(ScriptManager.Instance.GetScript(ScriptType.ActionRunner, ActionName));
             _script = script;
         }
