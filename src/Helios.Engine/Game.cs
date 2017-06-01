@@ -437,6 +437,48 @@ namespace Helios.Engine
             SendMessage(int.Parse(acctId), action.Args[0]);
         }
 
+        private void ForceTransport(int entityId, int roomId)
+        {
+            // LOOKUPS
+            var entity = _entities[entityId];
+            var oldRoom = GetRoomWithEntity(entityId);
+            var newRoom = _rooms[roomId];
+            var changeZone = oldRoom.Zone != newRoom.Zone;
+            var oldZone = _zones[oldRoom.Zone];
+            var newZone = _zones[newRoom.Zone];
+
+            //PHYSICAL MOVEMENT
+            if (changeZone)
+            {
+                //move entity between zones -- not used yet
+            }
+
+            oldRoom.Entities.Remove(entityId);
+            newRoom.Entities.Add(entityId);
+            entity.Traits.Set("room", newRoom.Id.ToString());
+
+            //EVENT NOTIFICATIONS
+            if (changeZone)
+            {
+                var leaveZone = new MudAction("leavezone", entityId, oldZone.Id);
+                oldZone.DoAction(leaveZone);
+                entity.DoAction(leaveZone);
+
+                var enterZone = new MudAction("enterzone", entityId, newZone.Id);
+                newZone.DoAction(enterZone);
+                entity.DoAction(enterZone);
+            }
+
+            var leaveRoom = new MudAction("leaveroom", entityId, 0);
+            oldRoom.DoAction(leaveRoom);
+            entity.DoAction(leaveRoom);
+            
+            var enterRoom = new MudAction("enterroom", entityId, 0);
+            newRoom.DoAction(enterRoom);
+            ActionRoomMobs(enterRoom, newRoom.Id);
+            ActionRoomItems(enterRoom, newRoom.Id);
+        }
+
         private void Transfer(MudAction action)
         {
             /*
