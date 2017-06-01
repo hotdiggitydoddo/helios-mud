@@ -313,7 +313,7 @@ namespace Helios.Engine
                 Commands.AssignCommand(character.Id, "west");
                 Commands.AssignCommand(character.Id, "east");
 
-                _timerRegistry.Add(new TimedMudAction(DateTime.UtcNow.AddSeconds(5).Ticks, "infotoplayer", character.Id, "This is an action delayed by 5 seconds."));
+                _timerRegistry.Add(new TimedMudAction(5, "infotoplayer", character.Id, "This is an action delayed by 5 seconds."));
             }
         }
 

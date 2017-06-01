@@ -19,7 +19,8 @@ namespace Helios.Engine.Actions
 
                     if (!action.IsValid)
                         break;
-
+                    
+                    action.Unhook();
                     Game.Instance.DoAction(action);
                         break;
                 }
