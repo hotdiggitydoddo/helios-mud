@@ -155,7 +155,7 @@ namespace Helios.Engine
             // else if (type == "attemptgetitem")
             //     GetItem(action.SenderId, action.ReceiverId, action.OtherEntity1);
 
-                //custom action
+            //custom action
             else if (_actionRunners.ContainsKey(type))
                 _actionRunners[type].Run(action);
         }
@@ -465,7 +465,7 @@ namespace Helios.Engine
             var leaveRoom = new MudAction("leaveroom", entityId, 0);
             oldRoom.DoAction(leaveRoom);
             entity.DoAction(leaveRoom);
-            
+
             var enterRoom = new MudAction("enterroom", entityId, 0);
             newRoom.DoAction(enterRoom);
             ActionRoomMobs(enterRoom, newRoom.Id);
@@ -478,21 +478,23 @@ namespace Helios.Engine
                entity to room
                room to entity
             */
-            
+
             //types of entities involved
             var e2e = _entities.ContainsKey(action.SenderId) && _entities.ContainsKey(action.ReceiverId);
             var e2r = _entities.ContainsKey(action.SenderId) && _rooms.ContainsKey(action.ReceiverId);
             var r2e = _rooms.ContainsKey(action.SenderId) && _entities.ContainsKey(action.ReceiverId);
-            
+
             var requestor = r2e ? _rooms[action.SenderId] : _entities[action.SenderId];
             var receiver = e2r ? _rooms[action.ReceiverId] : _entities[action.ReceiverId];
             var subject = _entities[action.OtherEntity1];
             var zone = _zones[GetRoomWithEntity(subject.Id).Zone];
 
             var isQuantity = subject.Traits.Has("quantity");
-            if (isQuantity)
+            var requestedQty = 1;
+            int.TryParse(action.Args[0], out requestedQty);
+
+            if (isQuantity && requestedQty > 1 && (e2e || e2r))
             {
-                var requestedQty = int.Parse(action.Args[0]);
                 if (requestedQty > int.Parse(subject.Traits.Get("quantity").Value))
                 {
                     DoAction(new MudAction("infotoplayer", 0, requestor.Id, "There aren't that many to pick up."));
@@ -505,17 +507,47 @@ namespace Helios.Engine
             if (!subject.DoAction(canTake) || !receiver.DoAction(canTake) || !zone.DoAction(canTake) || !requestor.DoAction(canTake))
                 return;
 
+            //physical movement
+            var newEntityId = 0;
+            MudEntity newEntity;
+            
+            if (isQuantity && requestedQty > 1 && requestedQty != int.Parse(subject.Traits.Get("quantity").Value))
+            {
+                 newEntity = _entityFactory.CreateEntity(subject.Name, (subject.Traits.GetAll().ToDictionary(x => x.Name, x => x.Value)));
+                _entities.Add(newEntity.Id, newEntity);
+                newEntityId = newEntity.Id;
+                newEntity.Traits.Set("quantity", requestedQty.ToString());
+            }
+            else 
+            {
+                if (r2e)
+                    _rooms[requestor.Id].Entities.Remove(subject.Id);
+                newEntityId = subject.Id;
+                newEntity = subject;
+            }
+
+            if (r2e)
+            {
+                if (newEntity.Traits.Has("quantity"))
+                receiver.Traits.Set("items", newEntityId.ToString());
+            }
+            else if (e2r)
+            {
+                requestor.Traits
+            }
+
+
 
 
 
 
             var canMove = new MudAction("canMove", requestor.Id, receiver.Id, subject.Id);
 
-            
-            
-            
-            
-            
+
+
+
+
+
             // 1) if there is another entity involved, as permission from it
             if (subject != null && !subject.DoAction(canMove))
                 return;
