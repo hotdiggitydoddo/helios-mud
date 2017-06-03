@@ -193,13 +193,6 @@ namespace Helios.Engine
         {
             return _portals.Values.Where(x => x.HasEntriesWithRoom(roomId)).ToList();
         }
-        // public List<MudPortal> GetRoomPortals(int roomId, string direction = null)
-        // {
-            
-        //     return string.IsNullOrWhiteSpace(direction)
-        //         ? _portals.Values.Where(x => x.Room == roomId).ToList()
-        //         _portalEntries.First().Value.
-        // }
 
         public MudZone GetZoneById(int zoneId)
         {
@@ -481,18 +474,48 @@ namespace Helios.Engine
 
         private void Transfer(MudAction action)
         {
-            /*
-                mob to room
-                item to room
-                mob to mob 
-             */
-
-            var requestor = _entities[action.SenderId];
-            var receiver = _entities[action.ReceiverId];
+            /* entity to entity
+               entity to room
+               room to entity
+            */
+            
+            //types of entities involved
+            var e2e = _entities.ContainsKey(action.SenderId) && _entities.ContainsKey(action.ReceiverId);
+            var e2r = _entities.ContainsKey(action.SenderId) && _rooms.ContainsKey(action.ReceiverId);
+            var r2e = _rooms.ContainsKey(action.SenderId) && _entities.ContainsKey(action.ReceiverId);
+            
+            var requestor = r2e ? _rooms[action.SenderId] : _entities[action.SenderId];
+            var receiver = e2r ? _rooms[action.ReceiverId] : _entities[action.ReceiverId];
             var subject = _entities[action.OtherEntity1];
+            var zone = _zones[GetRoomWithEntity(subject.Id).Zone];
+
+            var isQuantity = subject.Traits.Has("quantity");
+            if (isQuantity)
+            {
+                var requestedQty = int.Parse(action.Args[0]);
+                if (requestedQty > int.Parse(subject.Traits.Get("quantity").Value))
+                {
+                    DoAction(new MudAction("infotoplayer", 0, requestor.Id, "There aren't that many to pick up."));
+                    return;
+                }
+            }
+
+            //permission
+            var canTake = new MudAction("cantake", requestor.Id, receiver.Id, subject.Id, action.Args);
+            if (!subject.DoAction(canTake) || !receiver.DoAction(canTake) || !zone.DoAction(canTake) || !requestor.DoAction(canTake))
+                return;
+
+
+
+
 
             var canMove = new MudAction("canMove", requestor.Id, receiver.Id, subject.Id);
 
+            
+            
+            
+            
+            
             // 1) if there is another entity involved, as permission from it
             if (subject != null && !subject.DoAction(canMove))
                 return;
