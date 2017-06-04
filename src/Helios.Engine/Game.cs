@@ -151,6 +151,8 @@ namespace Helios.Engine
                 Say(action);
             else if (type == "attemptenterportal")
                 EnterPortal(action);
+            else if (type == "attemptreceive")
+                Transfer(action);
 
             // else if (type == "attemptgetitem")
             //     GetItem(action.SenderId, action.ReceiverId, action.OtherEntity1);
@@ -305,6 +307,7 @@ namespace Helios.Engine
                 Commands.AssignCommand(character.Id, "say");
                 Commands.AssignCommand(character.Id, "west");
                 Commands.AssignCommand(character.Id, "east");
+                Commands.AssignCommand(character.Id, "take");
 
                 _timerRegistry.Add(new TimedMudAction(5, "infotoplayer", character.Id, "This is an action delayed by 5 seconds."));
             }
@@ -489,11 +492,11 @@ namespace Helios.Engine
             var subject = _entities[action.OtherEntity1];
             var zone = _zones[GetRoomWithEntity(subject.Id).Zone];
 
-            var isQuantity = subject.Traits.Has("quantity");
+            var isItem = subject.Traits.Has("quantity");
             var requestedQty = 1;
             int.TryParse(action.Args[0], out requestedQty);
 
-            if (isQuantity && requestedQty > 1 && (e2e || e2r))
+            if (isItem && requestedQty > 1 && (e2e || e2r))
             {
                 if (requestedQty > int.Parse(subject.Traits.Get("quantity").Value))
                 {
@@ -511,7 +514,7 @@ namespace Helios.Engine
             var newEntityId = 0;
             MudEntity newEntity;
             
-            if (isQuantity && requestedQty > 1 && requestedQty != int.Parse(subject.Traits.Get("quantity").Value))
+            if (isItem && requestedQty > 1 && requestedQty != int.Parse(subject.Traits.Get("quantity").Value))
             {
                  newEntity = _entityFactory.CreateEntity(subject.Name, (subject.Traits.GetAll().ToDictionary(x => x.Name, x => x.Value)));
                 _entities.Add(newEntity.Id, newEntity);
@@ -528,43 +531,65 @@ namespace Helios.Engine
 
             if (r2e)
             {
+                //is subject an item?
                 if (newEntity.Traits.Has("quantity"))
-                receiver.Traits.Set("items", newEntityId.ToString());
+                {
+                    if (receiver.Traits.Has("items"))
+                    {
+                        var itemsString = receiver.Traits.Get("items").Value;
+                        var itemIds = itemsString.Split(',').Select(x => int.Parse(x)).ToList();
+                        itemIds.Add(subject.Id);
+                        receiver.Traits.Set("items", string.Join(",", itemIds.Select(x => x.ToString())));
+                    }
+                    else
+                    {
+                        receiver.Traits.Add("items", newEntityId.ToString());
+                    }
+                }
             }
             else if (e2r)
             {
-                requestor.Traits
             }
 
+            //notifications
+            var receivedEntity = new MudAction("receivedentity", requestor.Id, receiver.Id, newEntity.Id, 
+                newEntity.Traits.Has("quantity") ? newEntity.Traits.Get("quantity").Value : null);
 
+            var room = GetRoomWithEntity(requestor.Id);
+            ActionRoomMobs(receivedEntity, room.Id);
+            ActionRoomItems(receivedEntity, room.Id);
 
-
-
-
-            var canMove = new MudAction("canMove", requestor.Id, receiver.Id, subject.Id);
-
-
-
-
-
-
-            // 1) if there is another entity involved, as permission from it
-            if (subject != null && !subject.DoAction(canMove))
+            //TODO: CLEANUP ITEMS
+            if (!isItem || !newEntity.Traits.Has("isStackable"))
                 return;
-            // 2) ask permission from requestor and parent, if any
-            if (!requestor.DoAction(canMove))
-                return;
-            // 3) ask permission from receiver and its parent, if any
-            if (!receiver.DoAction(canMove))
+            
+            var entityItems = GetEntityItems(receiver).ToList();
+            var existingItems = entityItems.Where(x => x.Name == newEntity.Name).ToList();
+            
+            if (existingItems.Count <= 1)
                 return;
 
-            // 4) move the entity to the recipient
+            var totalQty = existingItems.Sum(x => int.Parse(x.Traits.Get("quantity").Value));
+            newEntity.Traits.Set("quantity", totalQty.ToString());
+            
+            var oldItem = existingItems.Single(x => x.Id != newEntity.Id);
+            entityItems.Remove(oldItem);
+            _entities.Remove(oldItem.Id);
 
+            receiver.Traits.Set("items", string.Join(",", entityItems.Select(x => x.Id.ToString())));
+        }
 
+        private IEnumerable<MudEntity> GetEntityItems(MudEntity entity)
+        {
+            var retVal = new List<MudEntity>();
+            if (!entity.Traits.Has("items"))
+                return retVal;
 
+            var itemsString = entity.Traits.Get("items").Value;
+            var itemIds = itemsString.Split(',').Select(x => int.Parse(x)).ToList();
 
-
-
+            retVal.AddRange(itemIds.Select(x => GetEntityById(x)));
+            return retVal;
         }
 
         private void RouteActionToEntity(int entityId, MudAction action)
