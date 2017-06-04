@@ -75,8 +75,10 @@ namespace Helios.Engine
             //add an item
             var torch = new MudEntity(777, "torch");
             torch.Traits.Add("item", "true");
+            torch.Traits.Add("quantity", "1");
             _entities.Add(torch.Id, torch);
             room3.Entities.Add(torch.Id);
+            torch.Traits.Add("room", room3.Id.ToString());
 
             //add a mouse and snake and bear
             var mouse = new MudEntity(888, "mouse");
@@ -199,6 +201,12 @@ namespace Helios.Engine
         public MudZone GetZoneById(int zoneId)
         {
             return _zones.ContainsKey(zoneId) ? _zones[zoneId] : null;
+        }
+
+        public int FindEntityInRoom(string search, int roomId)
+        {
+            var entity = GetEntitiesInRoom(roomId, x => x.Name.StartsWith(search)).FirstOrDefault();
+            return entity != null ? entity.Id : 0;
         }
 
         public void SendMessage(int accountId, string message, params string[] args)
@@ -555,6 +563,7 @@ namespace Helios.Engine
             var receivedEntity = new MudAction("receivedentity", requestor.Id, receiver.Id, newEntity.Id, 
                 newEntity.Traits.Has("quantity") ? newEntity.Traits.Get("quantity").Value : null);
 
+            //TODO: FIX BUG WHERE ROOM IS REQUESTOR!
             var room = GetRoomWithEntity(requestor.Id);
             ActionRoomMobs(receivedEntity, room.Id);
             ActionRoomItems(receivedEntity, room.Id);

@@ -11,7 +11,12 @@ end
 function execute(entityId, args)
     if checkUsage(args) then
         room = Game.Instance.GetRoomWithEntity(entityId);
-        Game.Instance.DoAction(MudAction.__new("attemptreceive", entityId, room.Id, 0, args[1]));
+        entity = Game.Instance.FindEntityInRoom(args[1], room.Id);
+        if entity == 0 then
+            Game.Instance.DoAction(MudAction.__new("infotoplayer", entityId, 0, "That is not here."));
+        else
+            Game.Instance.DoAction(MudAction.__new("attemptreceive", room.Id, entityId, entity, ""));
+        end
     else
         Game.Instance.DoAction(MudAction.__new("infotoplayer", entityId, 0, getUsage()));
     end
