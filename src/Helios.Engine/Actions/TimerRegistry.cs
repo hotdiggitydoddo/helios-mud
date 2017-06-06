@@ -11,6 +11,9 @@ namespace Helios.Engine.Actions
 
         public void Dispatch()
         {
+            if (Count() == 0 || Peek().DispatchTime > DateTime.UtcNow.Ticks)
+                return;
+
             while (Count() > 0)
             {
                 while (Peek().DispatchTime <= DateTime.UtcNow.Ticks)

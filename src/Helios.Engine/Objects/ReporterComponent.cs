@@ -37,10 +37,25 @@ namespace Helios.Engine.Objects
                 Game.Instance.SendMessage(_acctId, $"{action.Args[1]} says, \"{action.Args[0]}\"");
             else if (action.Type == "listinventory")
                 SeeInventory(action.SenderId);
+            else if (action.Type == "receivedentity")
+                ReceivedEntity(action);
             return true;
         }
 
+        private void ReceivedEntity(MudAction action)
+        {
+            var transType = action.Args[0];
+            var subject = Game.Instance.GetEntityById(action.OtherEntity1);
 
+            if (transType == "r2e")
+            {
+                var receiver = Game.Instance.GetEntityById(action.ReceiverId);
+                if (receiver.Id == Owner.Id)
+                    Game.Instance.SendMessage(_acctId, $"You pick up {subject.Name}.");
+                else
+                    Game.Instance.SendMessage(_acctId, $"{receiver.Name} picks up {subject.Name}.");
+            }
+        }
 
         private void EnterRoom(MudAction action)
         {

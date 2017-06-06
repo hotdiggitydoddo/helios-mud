@@ -569,11 +569,19 @@ namespace Helios.Engine
             }
 
             //notifications
-            var receivedEntity = new MudAction("receivedentity", requestor.Id, receiver.Id, newEntity.Id,
+            var transType = "";
+            if (e2e)
+                transType = "e2e";
+                else if (e2r)
+                transType = "e2r";
+                else
+                transType = "r2e";
+
+            var receivedEntity = new MudAction("receivedentity", requestor.Id, receiver.Id, newEntity.Id, transType,
                 newEntity.Traits.Has("quantity") ? newEntity.Traits.Get("quantity").Value : null);
 
             //TODO: FIX BUG WHERE ROOM IS REQUESTOR!
-            var room = GetRoomWithEntity(requestor.Id);
+            var room =  r2e ?  _rooms[requestor.Id] : GetRoomWithEntity(requestor.Id);
             ActionRoomMobs(receivedEntity, room.Id);
             ActionRoomItems(receivedEntity, room.Id);
 
