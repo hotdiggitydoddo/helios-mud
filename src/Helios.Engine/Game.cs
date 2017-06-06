@@ -76,6 +76,7 @@ namespace Helios.Engine
             var torch = new MudEntity(777, "torch");
             torch.Traits.Add("item", "true");
             torch.Traits.Add("quantity", "1");
+            ComponentManager.Instance.AssignComponent(torch, "item");
             _entities.Add(torch.Id, torch);
             room3.Entities.Add(torch.Id);
             torch.Traits.Add("room", room3.Id.ToString());
@@ -148,6 +149,8 @@ namespace Helios.Engine
             else if (type == "infotoplayer")
                 GameToPlayer(action);
             else if (type == "look")
+                RouteActionToEntity(action.SenderId, action);
+            else if (type == "listinventory")
                 RouteActionToEntity(action.SenderId, action);
             else if (type == "attemptsay")
                 Say(action);
@@ -316,6 +319,7 @@ namespace Helios.Engine
                 Commands.AssignCommand(character.Id, "west");
                 Commands.AssignCommand(character.Id, "east");
                 Commands.AssignCommand(character.Id, "take");
+                Commands.AssignCommand(character.Id, "items");
 
                 _timerRegistry.Add(new TimedMudAction(5, "infotoplayer", character.Id, "This is an action delayed by 5 seconds."));
             }
@@ -500,7 +504,7 @@ namespace Helios.Engine
             var subject = _entities[action.OtherEntity1];
             var zone = _zones[GetRoomWithEntity(subject.Id).Zone];
 
-            var isItem = subject.Traits.Has("quantity");
+            var isItem = subject.Components.Has("item");
             var requestedQty = 1;
             int.TryParse(action.Args[0], out requestedQty);
 
@@ -521,15 +525,19 @@ namespace Helios.Engine
             //physical movement
             var newEntityId = 0;
             MudEntity newEntity;
-            
+
             if (isItem && requestedQty > 1 && requestedQty != int.Parse(subject.Traits.Get("quantity").Value))
             {
-                 newEntity = _entityFactory.CreateEntity(subject.Name, (subject.Traits.GetAll().ToDictionary(x => x.Name, x => x.Value)));
+                newEntity = _entityFactory.CreateEntity(subject.Name, (subject.Traits.GetAll().ToDictionary(x => x.Name, x => x.Value)));
                 _entities.Add(newEntity.Id, newEntity);
                 newEntityId = newEntity.Id;
                 newEntity.Traits.Set("quantity", requestedQty.ToString());
+
+                var comps = subject.Components.GetAll();
+                foreach (var c in comps)
+                    ComponentManager.Instance.AssignComponent(newEntity, c.Name);
             }
-            else 
+            else
             {
                 if (r2e)
                     _rooms[requestor.Id].Entities.Remove(subject.Id);
@@ -540,11 +548,12 @@ namespace Helios.Engine
             if (r2e)
             {
                 //is subject an item?
-                if (newEntity.Traits.Has("quantity"))
+                if (newEntity.Components.Has("item"))
                 {
                     if (receiver.Traits.Has("items"))
                     {
                         var itemsString = receiver.Traits.Get("items").Value;
+
                         var itemIds = itemsString.Split(',').Select(x => int.Parse(x)).ToList();
                         itemIds.Add(subject.Id);
                         receiver.Traits.Set("items", string.Join(",", itemIds.Select(x => x.ToString())));
@@ -560,7 +569,7 @@ namespace Helios.Engine
             }
 
             //notifications
-            var receivedEntity = new MudAction("receivedentity", requestor.Id, receiver.Id, newEntity.Id, 
+            var receivedEntity = new MudAction("receivedentity", requestor.Id, receiver.Id, newEntity.Id,
                 newEntity.Traits.Has("quantity") ? newEntity.Traits.Get("quantity").Value : null);
 
             //TODO: FIX BUG WHERE ROOM IS REQUESTOR!
@@ -571,16 +580,16 @@ namespace Helios.Engine
             //TODO: CLEANUP ITEMS
             if (!isItem || !newEntity.Traits.Has("isStackable"))
                 return;
-            
+
             var entityItems = GetEntityItems(receiver).ToList();
             var existingItems = entityItems.Where(x => x.Name == newEntity.Name).ToList();
-            
+
             if (existingItems.Count <= 1)
                 return;
 
             var totalQty = existingItems.Sum(x => int.Parse(x.Traits.Get("quantity").Value));
             newEntity.Traits.Set("quantity", totalQty.ToString());
-            
+
             var oldItem = existingItems.Single(x => x.Id != newEntity.Id);
             entityItems.Remove(oldItem);
             _entities.Remove(oldItem.Id);

@@ -35,6 +35,8 @@ namespace Helios.Engine.Objects
                 EnterRoom(action);
             else if (action.Type == "say")
                 Game.Instance.SendMessage(_acctId, $"{action.Args[1]} says, \"{action.Args[0]}\"");
+            else if (action.Type == "listinventory")
+                SeeInventory(action.SenderId);
             return true;
         }
 
@@ -72,6 +74,27 @@ namespace Helios.Engine.Objects
             SeeRoomExits(room);
             SeeRoomMobs(room);
             SeeRoomItems(room);
+        }
+
+        private void SeeInventory(int mobId)
+        {
+            var mob = Game.Instance.GetEntityById(mobId);
+            var itemsString = mob.Traits.Get("items")?.Value;
+
+            if (string.IsNullOrWhiteSpace(itemsString))
+                {
+                    Game.Instance.SendMessage(_acctId, "You are carrying nothing.");
+                    return;
+                }
+            var itemIds = itemsString.Split(',').Select(x => int.Parse(x)).ToList();
+            var items = new List<MudEntity>();
+
+            foreach(var id in itemIds)
+            {
+               items.Add(Game.Instance.GetEntityById(id));
+            }
+            var msg = ConcatEntities(items);
+            Game.Instance.SendMessage(_acctId, $"You are carrying: {msg}.");
         }
 
         private void SeeRoomItems(MudRoom room)
