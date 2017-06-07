@@ -182,6 +182,7 @@ namespace Helios.Engine
             return (Dictionary<int, MudEntity>)_entities.Where(e => e.Value.Traits.Has(traitName));
         }
 
+        public MudEntity GetEntityByName(string name)
         public MudEntity GetEntityById(int id)
         {
             return _entities.ContainsKey(id) ? _entities[id] : null;
@@ -541,6 +542,14 @@ namespace Helios.Engine
             {
                 if (r2e)
                     _rooms[requestor.Id].Entities.Remove(subject.Id);
+                else if (e2r)
+                {
+                    var inventory = GetEntitiesFromTrait(requestor, "items").ToList();
+                    inventory.Remove(subject);
+                    requestor.Traits.Set("items", string.Join(",", inventory.Select(x => x.Id.ToString())));
+                    _rooms[receiver.Id].Entities.Add(subject.Id);
+                }
+                
                 newEntityId = subject.Id;
                 newEntity = subject;
             }
@@ -572,16 +581,15 @@ namespace Helios.Engine
             var transType = "";
             if (e2e)
                 transType = "e2e";
-                else if (e2r)
+            else if (e2r)
                 transType = "e2r";
-                else
+            else
                 transType = "r2e";
 
             var receivedEntity = new MudAction("receivedentity", requestor.Id, receiver.Id, newEntity.Id, transType,
                 newEntity.Traits.Has("quantity") ? newEntity.Traits.Get("quantity").Value : null);
 
-            //TODO: FIX BUG WHERE ROOM IS REQUESTOR!
-            var room =  r2e ?  _rooms[requestor.Id] : GetRoomWithEntity(requestor.Id);
+            var room = r2e ? _rooms[requestor.Id] : GetRoomWithEntity(requestor.Id);
             ActionRoomMobs(receivedEntity, room.Id);
             ActionRoomItems(receivedEntity, room.Id);
 
@@ -589,7 +597,7 @@ namespace Helios.Engine
             if (!isItem || !newEntity.Traits.Has("isStackable"))
                 return;
 
-            var entityItems = GetEntityItems(receiver).ToList();
+            var entityItems = GetEntitiesFromTrait(receiver, "items").ToList();
             var existingItems = entityItems.Where(x => x.Name == newEntity.Name).ToList();
 
             if (existingItems.Count <= 1)
@@ -605,16 +613,16 @@ namespace Helios.Engine
             receiver.Traits.Set("items", string.Join(",", entityItems.Select(x => x.Id.ToString())));
         }
 
-        private IEnumerable<MudEntity> GetEntityItems(MudEntity entity)
+        public IEnumerable<MudEntity> GetEntitiesFromTrait(MudEntity entity, string trait)
         {
             var retVal = new List<MudEntity>();
-            if (!entity.Traits.Has("items"))
+            if (!entity.Traits.Has(trait))
                 return retVal;
 
-            var itemsString = entity.Traits.Get("items").Value;
-            var itemIds = itemsString.Split(',').Select(x => int.Parse(x)).ToList();
+            var entitiesString = entity.Traits.Get(trait).Value;
+            var ids = entitiesString.Split(',').Select(x => int.Parse(x)).ToList();
 
-            retVal.AddRange(itemIds.Select(x => GetEntityById(x)));
+            retVal.AddRange(ids.Select(x => GetEntityById(x)));
             return retVal;
         }
 
